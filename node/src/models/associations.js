@@ -5,14 +5,14 @@ import quoteModel from "./quoteModel.js";
 // Aquí se definen las relaciones
 
 // Un rol puede tener muchos usuarios
-roleModel.hasMany(userModel, { foreignKey: "id_roleFK", as: "users" });
+roleModel.hasMany(userModel, { foreignKey: "id_roleFK"});
 
 // Un usuario pertenece a un rol
-userModel.belongsTo(roleModel, { foreignKey: "id_roleFK", as: "role" });
+userModel.belongsTo(roleModel, { foreignKey: "id_roleFK"});
 
 // Un usuario puede tener muchas citas
-roleModel.hasMany(Quote, { foreignKey: 'id_userFK' });
+userModel.hasMany(quoteModel, { foreignKey: 'id_userFK' });
 
 // Una cita pertenece a un usuario
-quoteModel.belongsTo(roleModel, { foreignKey: 'id_userFK' });
+quoteModel.belongsTo(userModel, { foreignKey: 'id_userFK' });
 

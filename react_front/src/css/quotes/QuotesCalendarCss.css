@@ -1,0 +1,30 @@
+.calendar-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    justify-items: center;
+}
+
+.quote-list {
+    margin-top: 20px;
+    text-align: left;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.quote-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.quote-list li {
+    background-color: #f1f1f1;
+    margin: 6px 0;
+    padding: 10px;
+    border-radius: 6px;
+}

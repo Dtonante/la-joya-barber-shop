@@ -2,29 +2,27 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar.js";
-import "../css/user/ShowUsersCss.css"
+import QuotesCalendar from "./QuotesCalendar.js";
+import "../css/user/ShowUsersCss.css"; 
 
-const URI_USERS = "http://localhost:3000/api/v1/users";
+const URI_QUOTES = "http://localhost:3000/api/v1/quotes";
 
-
-const CompShowUser = () => {
-    const [user, setUser] = useState([]);
+const CompShowQuotes = () => {
+    const [quotes, setQuotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [pagina, setPagina] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
     const [filtroCampo, setFiltroCampo] = useState("");
     const [filtroValor, setFiltroValor] = useState("");
-
-    // Sidebar abierto o cerrado
     const [sidebarAbierto, setSidebarAbierto] = useState(true);
     const toggleSidebar = () => setSidebarAbierto(!sidebarAbierto);
 
     useEffect(() => {
-        getUser();
+        getQuotes();
     }, [pagina, filtroCampo]);
 
-    const getUser = async () => {
+    const getQuotes = async () => {
         setLoading(true);
         setError(null);
 
@@ -33,7 +31,7 @@ const CompShowUser = () => {
             if (!token) throw new Error("Token no disponible");
 
             const api = axios.create({
-                baseURL: URI_USERS,
+                baseURL: URI_QUOTES,
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -44,14 +42,14 @@ const CompShowUser = () => {
 
             const res = await api.get(url);
             if (res.data && Array.isArray(res.data.data)) {
-                setUser(res.data.data);
+                setQuotes(res.data.data);
                 setTotalPaginas(res.data.totalPaginas);
             } else {
                 throw new Error("Formato de respuesta incorrecto");
             }
         } catch (err) {
-            console.error("Error al obtener datos:", err);
-            setError("Error al cargar datos");
+            console.error("Error al obtener citas:", err);
+            setError("Error al cargar las citas");
         } finally {
             setLoading(false);
         }
@@ -76,23 +74,20 @@ const CompShowUser = () => {
         <div style={{ display: "flex" }}>
             <Sidebar isOpen={sidebarAbierto} toggleSidebar={toggleSidebar} />
             <div style={{
-                marginLeft: sidebarAbierto ? "200px" : "-5px",
+                marginLeft: sidebarAbierto ? "200px" : "60px",
                 transition: "margin-left 0.3s",
                 padding: "20px",
                 width: "100%"
             }}>
                 <div className="container">
-            
-
-
                     <div className="row">
                         <div className="col">
-
                             {/* Filtros */}
                             <div className="filter-container mb-3">
                                 <select className="form-select" value={filtroCampo} onChange={(e) => setFiltroCampo(e.target.value)}>
                                     <option value="">Selecciona un campo</option>
-                                    <option value="email">Email</option>
+                                    <option value="id_userFK">ID Usuario</option>
+                                    <option value="dateAndTimeQuote">Fecha</option>
                                     <option value="name">Nombre</option>
                                 </select>
 
@@ -102,60 +97,60 @@ const CompShowUser = () => {
                                     placeholder="Valor a filtrar"
                                     value={filtroValor}
                                     onChange={(e) => setFiltroValor(e.target.value)}
-                                    disabled={!filtroCampo} // Deshabilitar si no hay campo seleccionado
+                                    disabled={!filtroCampo}
                                 />
 
                                 <button
                                     className="btn btn-primary"
                                     onClick={() => {
                                         setPagina(1);
-                                        getUser(); // Llama manualmente a la función
+                                        getQuotes();
                                     }}
                                     disabled={!filtroCampo || !filtroValor}
                                 >
                                     Filtrar
                                 </button>
 
-
-                                <button className="btn btn-secondary" onClick={limpiarFiltros} disabled={!filtroCampo && !filtroValor}>
+                                <button
+                                    className="btn btn-secondary"
+                                    onClick={limpiarFiltros}
+                                    disabled={!filtroCampo && !filtroValor}
+                                >
                                     Limpiar
                                 </button>
                             </div>
 
-                            {/* Tabla */}
-                            <div className="table-responsive">
-                                <table className="table">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Nombre</th>
-                                            <th>Email</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {user.length > 0 ? (
-                                            user.map((usuario) => (
-                                                <tr key={usuario.id_userPK}>
-                                                    <td>{usuario.id_userPK}</td>
-                                                    <td>{usuario.name}</td>
-                                                    <td>{usuario.email}</td>
-                                                    <td>
-                                                        <Link to={`/editar/${usuario.id_userPK}`} className="btn btn-info">Editar</Link>
-                                                        {/* <button onClick={() => deleteUser(usuario.id_userPK)} className="btn btn-danger">Eliminar</button> */}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="4">No hay usuarios registrados</td>
+                            {/* Tabla de citas */}
+                            <table className="table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha y Hora</th>
+                                        <th>Nombre del Usuario</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {quotes.length > 0 ? (
+                                        quotes.map((quote) => (
+                                            <tr key={quote.id_quotePK}>
+                                                <td>{quote.tbl_user?.name || "Sin nombre"}</td> 
+                                                <td>{new Date(quote.dateAndTimeQuote).toLocaleString()}</td>
+                                                <td>
+                                                    <Link to={`/editar-cita/${quote.id_quotePK}`} className="btn btn-info">
+                                                        Editar
+                                                    </Link>
+                                                </td>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4">No hay citas registradas</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
 
-                            {/* Controles de paginación */}
+                            {/* Paginación */}
                             <div className="pagination">
                                 <button onClick={() => cambiarPagina(pagina - 1)} disabled={pagina === 1}>
                                     Anterior
@@ -167,13 +162,13 @@ const CompShowUser = () => {
                                     Siguiente
                                 </button>
                             </div>
-
                         </div>
+                        <QuotesCalendar/>
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 
-export default CompShowUser;
+export default CompShowQuotes;

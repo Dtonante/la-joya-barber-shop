@@ -31,12 +31,12 @@ const Login = () => {
         localStorage.setItem("token", response.data.token); // Guardar token
         localStorage.setItem("rol", rol); // Guardar el id_rolFK
         localStorage.setItem("user", response.data.user.id_userPK); // Guardar el id_userPK
-        console.log("user", response.data.user.id_userPK);
-        console.log("rol", rol);
+        localStorage.setItem("name_user", response.data.user.name); // Guardar el name_user
+        
       
         // Redirección según el rol
         if (rol == 1) {
-          navigate("/dashboard");
+          navigate("/listUsers");
         } else if (rol == 2) {
           navigate("/createQuote");
         } else {
