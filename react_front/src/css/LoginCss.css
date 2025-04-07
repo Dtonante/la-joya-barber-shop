@@ -1,0 +1,117 @@
+/* Login.css */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .login-background {
+    background-image: url('../../public/fondo_barber.jpg');
+    background-repeat: repeat;
+    background-size: 500px 500px;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  
+  .login-card {
+    background: white;
+    padding: 32px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 16px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    box-sizing: border-box;
+  }
+  
+  .login-avatar {
+    margin: 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #1976d2; /* color de fondo de respaldo */
+    background-image: url('../../public/fondo_barber-Photoroom.jpg'); /* imagen desde /public */
+    background-size: cover;
+    background-position: center;
+  }
+  
+  
+  
+  .login-title {
+    margin-top: 16px;
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: bold;
+  }
+  
+  .login-error {
+    background-color: #f44336;
+    color: white;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  
+  .login-input {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #1976d2;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    margin-top: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .login-button:hover:not(:disabled) {
+    background-color: #1565c0;
+  }
+  
+  .login-button:disabled {
+    background-color: #90caf9;
+    cursor: not-allowed;
+  }
+  
+  /* 🔽 Responsivo para móviles */
+  @media (max-width: 480px) {
+    .login-card {
+      padding: 24px;
+      border-radius: 12px;
+    }
+  
+    .login-title {
+      font-size: 20px;
+    }
+  
+    .login-input {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .login-button {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .login-avatar {
+      width: 48px;
+      height: 48px;
+      font-size: 24px;
+    }
+  }
+  
