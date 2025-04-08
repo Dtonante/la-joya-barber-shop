@@ -71,7 +71,7 @@ const CompShowQuotes = () => {
     if (error) return <p>{error}</p>;
 
     return (
-        <div style={{ display: "flex" }}>
+        <div style={{ display: "flex" }} className="je">
             <Sidebar isOpen={sidebarAbierto} toggleSidebar={toggleSidebar} />
             <div style={{
                 marginLeft: sidebarAbierto ? "200px" : "60px",

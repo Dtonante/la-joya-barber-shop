@@ -36,9 +36,9 @@ const Login = () => {
       
         // Redirección según el rol
         if (rol == 1) {
-          navigate("/listUsers");
+          navigate("/homeClients");
         } else if (rol == 2) {
-          navigate("/createQuote");
+          navigate("/homeClients");
         } else {
           setError("Rol no reconocido.");
         }
