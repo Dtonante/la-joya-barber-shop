@@ -4,7 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import axios from "axios";
 import "../css/quotes/QuotesCalendarCss.css"; // Podés crear estilos propios
 
-const URI_GET_QUOTES = "http://localhost:3000/api/v1/quotes";
+const URI_GET_QUOTES_CALENDAR = "http://localhost:3000/api/v1/quotes/all/calendar";
 
 const QuotesCalendar = () => {
     const [quotes, setQuotes] = useState([]);
@@ -17,7 +17,7 @@ const QuotesCalendar = () => {
                 if (!token) throw new Error("Token no disponible");
 
                 const api = axios.create({
-                    baseURL: URI_GET_QUOTES,
+                    baseURL: URI_GET_QUOTES_CALENDAR,
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -31,21 +31,44 @@ const QuotesCalendar = () => {
         fetchQuotes();
     }, []);
 
+    const quoteCountsByDate = quotes.reduce((acc, quote) => {
+        const date = new Date(quote.dateAndTimeQuote).toLocaleDateString("en-CA");
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+    }, {});
+
+
+
     const handleDateChange = (date) => {
-        const selected = new Date(date).toISOString().split("T")[0];
-    
+        const selected = new Date(date).toLocaleDateString("en-CA"); // YYYY-MM-DD
+
         const filtered = quotes
-            .filter(q => q.dateAndTimeQuote.startsWith(selected))
-            .sort((a, b) => new Date(a.dateAndTimeQuote) - new Date(b.dateAndTimeQuote)); // Orden ascendente
-    
+            .filter((q) => {
+                const quoteDate = new Date(q.dateAndTimeQuote).toLocaleDateString("en-CA");
+                return quoteDate === selected;
+            })
+            .sort((a, b) => new Date(a.dateAndTimeQuote) - new Date(b.dateAndTimeQuote));
+
         setSelectedDateQuotes(filtered);
     };
-    
+
+
 
     return (
         <div className="calendar-container">
             <h2>Calendario de Citas</h2>
-            <Calendar onChange={handleDateChange} />
+            <Calendar onChange={handleDateChange}
+                tileClassName={({ date, view }) => {
+                    if (view === 'month') {
+                        const dateStr = date.toLocaleDateString("en-CA");
+                        const count = quoteCountsByDate[dateStr] || 0;
+
+                        if (count === 0) return 'yellow-day';
+                        if (count >= 1 && count <= 5) return 'orange-day';
+                        if (count >= 6 && count <= 10) return 'pink-day';
+                        if (count >= 11) return 'green-day';
+                    }
+                }} />
             <div className="quote-list">
                 <h3>Citas del día</h3>
                 {selectedDateQuotes.length > 0 ? (

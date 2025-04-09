@@ -22,6 +22,58 @@ export const getQuotes = (req, res) => {
     });
 };
 
+// obtener todas las citas sin paginado y filtros para el calendario
+export const getAllQuotes = async (req, res) => {
+    try {
+        const quotes = await QuoteModel.findAll({
+            include: [{
+                model: UserModel,
+                attributes: ["name", "email"]
+            }],
+            order: [['dateAndTimeQuote', 'ASC']]
+        });
+
+        res.status(200).json({ data: quotes });
+    } catch (error) {
+        console.error("Error al obtener todas las citas:", error);
+        res.status(500).json({ message: "Error al obtener las citas" });
+    }
+};
+
+
+// Obtener citas futuras con paginación y filtros
+export const getUpcomingQuotes = (req, res) => {
+    const ahora = new Date();
+
+    const allowedFilters = ["id_userFK"]; // quitamos dateAndTimeQuote para evitar conflicto
+    const filters = generateFilters(req.query, allowedFilters);
+
+    filters.dateAndTimeQuote = {
+        [Op.gte]: ahora
+    };
+
+    const userWhere = req.query.name
+        ? { name: { [Op.like]: `%${req.query.name}%` } }
+        : undefined;
+
+    paginate(QuoteModel, req, res, filters, {
+        include: [
+            {
+                model: UserModel,
+                attributes: ["name", "email"],
+                where: userWhere
+            }
+        ],
+        order: [["dateAndTimeQuote", "ASC"]]
+    });
+};
+
+
+
+
+
+
+
 // Obtener una cita por ID
 export const getQuotesForID = async (req, res) => {
     try {

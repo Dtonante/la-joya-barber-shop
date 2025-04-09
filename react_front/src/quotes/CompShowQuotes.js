@@ -5,7 +5,7 @@ import Sidebar from "../sidebar/Sidebar.js";
 import QuotesCalendar from "./QuotesCalendar.js";
 import "../css/user/ShowUsersCss.css"; 
 
-const URI_QUOTES = "http://localhost:3000/api/v1/quotes";
+const URI_QUOTES_UPCOMING_UPDATE = "http://localhost:3000/api/v1/quotes/upcoming/update";
 
 const CompShowQuotes = () => {
     const [quotes, setQuotes] = useState([]);
@@ -31,7 +31,7 @@ const CompShowQuotes = () => {
             if (!token) throw new Error("Token no disponible");
 
             const api = axios.create({
-                baseURL: URI_QUOTES,
+                baseURL: URI_QUOTES_UPCOMING_UPDATE,
                 headers: { Authorization: `Bearer ${token}` },
             });
 

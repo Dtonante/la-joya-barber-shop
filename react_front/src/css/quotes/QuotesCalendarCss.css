@@ -28,3 +28,23 @@
     padding: 10px;
     border-radius: 6px;
 }
+
+.yellow-day {
+    background-color: #fff59d !important; /* amarillo suave */
+    border-radius: 50%;
+}
+
+.orange-day {
+    background-color: #c4811d !important; /* naranja suave */
+    border-radius: 50%;
+}
+
+.pink-day {
+    background-color: #f48fb1 !important; /* rosado suave */
+    border-radius: 50%;
+}
+
+.green-day {
+    background-color: #81c784 !important; /* verde suave */
+    border-radius: 50%;
+}
