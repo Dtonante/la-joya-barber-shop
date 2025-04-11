@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../css/sidebar/SidebarCss.css";
@@ -12,6 +11,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     // Todos los ítems posibles
     const allNavItems = [
         { to: "/homeClients", label: "Inicio", icon: <FaHome /> },
+        { to: "/quoteUser", label: "Mis Citas", icon: <FaClipboard /> },
         { to: "/listUsers", label: "Usuarios", icon: <FaUser /> },
         { to: "/listQuotes", label: "Citas", icon: <FaCalendarAlt /> },
         { to: "/createQuote", label: "Agendar Cita", icon: <FaClipboard /> },
@@ -32,7 +32,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     let filteredNavItems = [];
 
     if (role === "1") {
-        filteredNavItems = allNavItems.filter(item => item.label !== "Agendar Cita");
+        filteredNavItems = allNavItems.filter(item => item.label !== "Agendar Cita" && item.label !== "Mis Citas");
     } else if (role === "2") {
         filteredNavItems = allNavItems.filter(item => item.label !== "Usuarios" && item.label !== "Citas");
     } else {

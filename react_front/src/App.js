@@ -9,6 +9,9 @@ import CreateQuotes from './quotes/CreateQuotes.js';
 import CompShowQuotes from './quotes/CompShowQuotes.js';
 import QuotesCalendar from './quotes/QuotesCalendar.js';
 import CompHome from './homeClients/HomeClients.js';
+import HorasDisponibles from './quotes/HorasDisponibles.js';
+import CompShowCitasUsuario from './user/quoteUser.js';
+
 
 
 function App() {
@@ -22,6 +25,9 @@ function App() {
         <Route path="/homeClients" element={<PrivateRoute><CompHome /></PrivateRoute>} />
         <Route path="/listQuotes" element={<PrivateRoute><CompShowQuotes /></PrivateRoute>} />
         <Route path="/quotesCalendar" element={<PrivateRoute><QuotesCalendar /></PrivateRoute>} />
+        <Route path="/horas-disponibles" element={<PrivateRoute><HorasDisponibles /></PrivateRoute>} />
+        <Route path="/quoteUser" element={<PrivateRoute><CompShowCitasUsuario /></PrivateRoute>} />
+        
       </Routes>
     </BrowserRouter>
   );

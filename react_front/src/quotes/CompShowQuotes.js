@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar.js";
 import QuotesCalendar from "./QuotesCalendar.js";
-import "../css/user/ShowUsersCss.css"; 
+import "../css/user/ShowUsersCss.css";
 
 const URI_QUOTES_UPCOMING_UPDATE = "http://localhost:3000/api/v1/quotes/upcoming/update";
 
@@ -74,7 +74,7 @@ const CompShowQuotes = () => {
         <div style={{ display: "flex" }} className="je">
             <Sidebar isOpen={sidebarAbierto} toggleSidebar={toggleSidebar} />
             <div style={{
-                marginLeft: sidebarAbierto ? "200px" : "60px",
+                marginLeft: sidebarAbierto ? "200px" : "0px",
                 transition: "margin-left 0.3s",
                 padding: "20px",
                 width: "100%"
@@ -120,35 +120,40 @@ const CompShowQuotes = () => {
                                 </button>
                             </div>
 
-                            {/* Tabla de citas */}
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha y Hora</th>
-                                        <th>Nombre del Usuario</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {quotes.length > 0 ? (
-                                        quotes.map((quote) => (
-                                            <tr key={quote.id_quotePK}>
-                                                <td>{quote.tbl_user?.name || "Sin nombre"}</td> 
-                                                <td>{new Date(quote.dateAndTimeQuote).toLocaleString()}</td>
-                                                <td>
-                                                    <Link to={`/editar-cita/${quote.id_quotePK}`} className="btn btn-info">
-                                                        Editar
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
+
+
+                            <div className="table-responsive">
+                                {/* Tabla de citas */}
+                                <table className="table">
+                                    <thead>
                                         <tr>
-                                            <td colSpan="4">No hay citas registradas</td>
+                                            <th>Fecha y Hora</th>
+                                            <th>Nombre del Usuario</th>
+                                            <th>Acciones</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        {quotes.length > 0 ? (
+                                            quotes.map((quote) => (
+                                                <tr key={quote.id_quotePK}>
+                                                    <td>{quote.tbl_user?.name || "Sin nombre"}</td>
+                                                    <td>{new Date(quote.dateAndTimeQuote).toLocaleString()}</td>
+                                                    <td>
+                                                        <Link to={`/editar-cita/${quote.id_quotePK}`} className="btn btn-info">
+                                                            Editar
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4">No hay citas registradas</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+
+                            </div>
 
                             {/* Paginación */}
                             <div className="pagination">
@@ -163,7 +168,7 @@ const CompShowQuotes = () => {
                                 </button>
                             </div>
                         </div>
-                        <QuotesCalendar/>
+                        <QuotesCalendar />
                     </div>
                 </div>
             </div>

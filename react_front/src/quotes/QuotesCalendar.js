@@ -53,22 +53,33 @@ const QuotesCalendar = () => {
     };
 
 
-
     return (
         <div className="calendar-container">
             <h2>Calendario de Citas</h2>
-            <Calendar onChange={handleDateChange}
-                tileClassName={({ date, view }) => {
-                    if (view === 'month') {
-                        const dateStr = date.toLocaleDateString("en-CA");
-                        const count = quoteCountsByDate[dateStr] || 0;
-
-                        if (count === 0) return 'yellow-day';
-                        if (count >= 1 && count <= 5) return 'orange-day';
-                        if (count >= 6 && count <= 10) return 'pink-day';
-                        if (count >= 11) return 'green-day';
-                    }
-                }} />
+            <div className="calendar-wrapper">
+                <div className="calendar-legend">
+                    <h4>Leyenda</h4>
+                    <ul>
+                        <li><span className="legend-color orange-day" /> 1 a 5 citas</li>
+                        <li><span className="legend-color pink-day" /> 6 a 10 citas</li>
+                        <li><span className="legend-color green-day" /> 11 o más citas</li>
+                    </ul>
+                </div>
+    
+                <Calendar onChange={handleDateChange}
+                    tileClassName={({ date, view }) => {
+                        if (view === 'month') {
+                            const dateStr = date.toLocaleDateString("en-CA");
+                            const count = quoteCountsByDate[dateStr] || 0;
+    
+                            if (count === 0) return 'yellow-day';
+                            if (count >= 1 && count <= 5) return 'orange-day';
+                            if (count >= 6 && count <= 10) return 'pink-day';
+                            if (count >= 11) return 'green-day';
+                        }
+                    }} />
+            </div>
+    
             <div className="quote-list">
                 <h3>Citas del día</h3>
                 {selectedDateQuotes.length > 0 ? (
@@ -79,13 +90,48 @@ const QuotesCalendar = () => {
                             </li>
                         ))}
                     </ul>
-
                 ) : (
                     <p>No hay citas para este día.</p>
                 )}
             </div>
         </div>
     );
+    
+
+
+
+    // return (
+    //     <div className="calendar-container">
+    //         <h2>Calendario de Citas</h2>
+    //         <Calendar onChange={handleDateChange}
+    //             tileClassName={({ date, view }) => {
+    //                 if (view === 'month') {
+    //                     const dateStr = date.toLocaleDateString("en-CA");
+    //                     const count = quoteCountsByDate[dateStr] || 0;
+
+    //                     if (count === 0) return 'yellow-day';
+    //                     if (count >= 1 && count <= 5) return 'orange-day';
+    //                     if (count >= 6 && count <= 10) return 'pink-day';
+    //                     if (count >= 11) return 'green-day';
+    //                 }
+    //             }} />
+    //         <div className="quote-list">
+    //             <h3>Citas del día</h3>
+    //             {selectedDateQuotes.length > 0 ? (
+    //                 <ul>
+    //                     {selectedDateQuotes.map((quote) => (
+    //                         <li key={quote.id_quotePK}>
+    //                             👤 {quote.tbl_user?.name} — 🕒 {new Date(quote.dateAndTimeQuote).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+    //                         </li>
+    //                     ))}
+    //                 </ul>
+
+    //             ) : (
+    //                 <p>No hay citas para este día.</p>
+    //             )}
+    //         </div>
+    //     </div>
+    // );
 };
 
 export default QuotesCalendar;
