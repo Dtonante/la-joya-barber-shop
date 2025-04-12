@@ -89,19 +89,43 @@ export const getQuotesForID = async (req, res) => {
 };
 
 // Obtener todas las citas por id_userFK
+// export const getQuotesByUser = async (req, res) => {
+//     try {
+//         const { id_userFK } = req.params;
+
+//         const citas = await QuoteModel.findAll({
+//             where: { id_userFK },
+//         });
+
+//         if (!citas || citas.length === 0) {
+//             return res.status(404).json({ message: "No se encontraron citas para este usuario" });
+//         }
+
+//         res.status(200).json(citas);
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Error al obtener las citas del usuario",
+//             error: error.message,
+//         });
+//     }
+// };
+
 export const getQuotesByUser = async (req, res) => {
     try {
         const { id_userFK } = req.params;
 
-        const citas = await QuoteModel.findAll({
-            where: { id_userFK },
+        // Incluimos el filtro de estado y cualquier otro campo permitido
+        const allowedFilters = ["status", "dateAndTimeQuote"]; // puedes agregar más si quieres
+        const filters = generateFilters(req.query, allowedFilters);
+
+        // Aseguramos que solo se traigan las citas de ese usuario
+        filters.id_userFK = id_userFK;
+
+        // Usamos la función de paginación
+        await paginate(QuoteModel, req, res, filters, {
+            order: [["dateAndTimeQuote", "DESC"]]
         });
 
-        if (!citas || citas.length === 0) {
-            return res.status(404).json({ message: "No se encontraron citas para este usuario" });
-        }
-
-        res.status(200).json(citas);
     } catch (error) {
         res.status(500).json({
             message: "Error al obtener las citas del usuario",
@@ -110,14 +134,78 @@ export const getQuotesByUser = async (req, res) => {
     }
 };
 
-
 //// Crear una cita 
+// export const createQuote = async (req, res) => {
+//     try {
+//         const { id_userFK, dateAndTimeQuote } = req.body;
+
+//         if (!id_userFK || !dateAndTimeQuote) {
+//             return res.status(400).json({ message: "Todos los campos son obligatorios" });
+//         }
+
+//         // Convertir la fecha y hora a objeto Date
+//         const fechaHora = new Date(dateAndTimeQuote);
+//         const hora = fechaHora.getHours();
+//         const minutos = fechaHora.getMinutes();
+
+//         // Validar horario laboral: entre 08:00 y 17:00
+//         const horaEnMinutos = hora * 60 + minutos;
+//         const inicioLaboral = 9 * 60;   // 08:00
+//         const finLaboral = 20 * 60;     // 17:00
+
+//         if (horaEnMinutos < inicioLaboral || horaEnMinutos >= finLaboral) {
+//             return res.status(400).json({
+//                 message: "La cita debe estar dentro del horario laboral (08:00 - 17:00)"
+//             });
+//         }
+
+//          // Validar que no esté en el horario de almuerzo (12:00 - 14:00)
+//          const inicioAlmuerzo = 12 * 60;
+//          const finAlmuerzo = 14 * 60;
+
+//         // Verificar si ya existe una cita para esa fecha y hora
+//         const citaExistente = await QuoteModel.findOne({
+//             where: { dateAndTimeQuote }
+//         });
+
+//         if (citaExistente) {
+//             return res.status(409).json({
+//                 message: "Ya hay una cita agendada para esta fecha y hora"
+//             });
+//         }
+
+//         // Crear la nueva cita si no hay conflicto
+//         const nuevaCita = await QuoteModel.create({
+//             id_userFK,
+//             dateAndTimeQuote
+//         });
+
+//         res.status(201).json({ message: "Cita creada con éxito", cita: nuevaCita });
+//     } catch (error) {
+//         res.status(500).json({ message: "Error al crear la cita", error: error.message });
+//     }
+// };
+
 export const createQuote = async (req, res) => {
     try {
         const { id_userFK, dateAndTimeQuote } = req.body;
 
         if (!id_userFK || !dateAndTimeQuote) {
             return res.status(400).json({ message: "Todos los campos son obligatorios" });
+        }
+
+        // Validar si el usuario ya tiene una cita activa
+        const citaActiva = await QuoteModel.findOne({
+            where: {
+                id_userFK,
+                status: "activa"
+            }
+        });
+
+        if (citaActiva) {
+            return res.status(400).json({
+                message: "Ya tienes una cita activa. No puedes agendar otra hasta que se complete o cancele."
+            });
         }
 
         // Convertir la fecha y hora a objeto Date
@@ -127,8 +215,8 @@ export const createQuote = async (req, res) => {
 
         // Validar horario laboral: entre 08:00 y 17:00
         const horaEnMinutos = hora * 60 + minutos;
-        const inicioLaboral = 9 * 60;   // 08:00
-        const finLaboral = 20 * 60;     // 17:00
+        const inicioLaboral = 8 * 60;   // 08:00
+        const finLaboral = 17 * 60;     // 17:00
 
         if (horaEnMinutos < inicioLaboral || horaEnMinutos >= finLaboral) {
             return res.status(400).json({
@@ -136,9 +224,15 @@ export const createQuote = async (req, res) => {
             });
         }
 
-         // Validar que no esté en el horario de almuerzo (12:00 - 14:00)
-         const inicioAlmuerzo = 12 * 60;
-         const finAlmuerzo = 14 * 60;
+        // Validar que no esté en el horario de almuerzo (12:00 - 14:00)
+        const inicioAlmuerzo = 12 * 60;
+        const finAlmuerzo = 14 * 60;
+
+        if (horaEnMinutos >= inicioAlmuerzo && horaEnMinutos < finAlmuerzo) {
+            return res.status(400).json({
+                message: "No se pueden agendar citas durante el horario de almuerzo (12:00 - 14:00)"
+            });
+        }
 
         // Verificar si ya existe una cita para esa fecha y hora
         const citaExistente = await QuoteModel.findOne({
@@ -151,13 +245,15 @@ export const createQuote = async (req, res) => {
             });
         }
 
-        // Crear la nueva cita si no hay conflicto
+        // Crear la nueva cita
         const nuevaCita = await QuoteModel.create({
             id_userFK,
-            dateAndTimeQuote
+            dateAndTimeQuote,
+            status: "activa" // establecer estado inicial
         });
 
         res.status(201).json({ message: "Cita creada con éxito", cita: nuevaCita });
+
     } catch (error) {
         res.status(500).json({ message: "Error al crear la cita", error: error.message });
     }

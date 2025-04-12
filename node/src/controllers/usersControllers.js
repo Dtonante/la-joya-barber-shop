@@ -64,19 +64,6 @@ export const updateUser = async (req, res) => {
 };
 
 
-// // Login y generación de JWT
-// export const login = async (req, res) => {
-//     const { email, password } = req.body;
-//     const usuario = await User.findOne({ where: { email } });
-
-//     if (!usuario || !(await bcrypt.compare(password, usuario.password))) {
-//         return res.status(401).json({ error: "Credenciales inválidas" });
-//     }
-
-//     const token = jwt.sign({ id: usuario.id_userPK, email: usuario.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
-//     res.json({ token });
-// };
-
 // Login y generación de JWT
 export const login = async (req, res) => {
     const { email, password } = req.body;

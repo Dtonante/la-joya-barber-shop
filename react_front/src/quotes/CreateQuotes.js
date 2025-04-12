@@ -71,12 +71,20 @@ const CreateQuotes = () => {
       setMensaje("Cita creada con éxito.");
       setDateAndTimeQuote("");
     } catch (err) {
-      if (err.response && err.response.status === 409) {
-        setError("Ya hay una cita agendada para esta fecha y hora.");
+      if (err.response) {
+        const status = err.response.status;
+        const mensajeServidor = err.response.data?.message;
+    
+        if ((status === 400 || status === 409) && mensajeServidor) {
+          setError(mensajeServidor);
+        } else {
+          setError("Error al crear la cita.");
+        }
       } else {
-        setError("Error al crear la cita.");
+        setError("Error de conexión con el servidor.");
       }
     }
+    
   };
 
   return (
