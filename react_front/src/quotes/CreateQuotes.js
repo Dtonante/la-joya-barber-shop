@@ -134,15 +134,8 @@ const CreateQuotes = () => {
                 onChange={(date) => {
                   setDateAndTimeQuote(date); // YYYY-MM-DDTHH:mm
                 }}
-                showTimeSelect
-                timeFormat="HH:mm"
-                timeIntervals={30}
-                timeCaption="Hora"
                 dateFormat="yyyy-MM-dd HH:mm"
                 minDate={new Date()}
-                minTime={new Date(new Date().setHours(8, 0, 0, 0))}
-                maxTime={new Date(new Date().setHours(17, 0, 0, 0))}
-
                 locale={es}
                 inline
               />

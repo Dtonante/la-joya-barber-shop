@@ -127,14 +127,18 @@ export const createQuote = async (req, res) => {
 
         // Validar horario laboral: entre 08:00 y 17:00
         const horaEnMinutos = hora * 60 + minutos;
-        const inicioLaboral = 8 * 60;   // 08:00
-        const finLaboral = 17 * 60;     // 17:00
+        const inicioLaboral = 9 * 60;   // 08:00
+        const finLaboral = 20 * 60;     // 17:00
 
         if (horaEnMinutos < inicioLaboral || horaEnMinutos >= finLaboral) {
             return res.status(400).json({
                 message: "La cita debe estar dentro del horario laboral (08:00 - 17:00)"
             });
         }
+
+         // Validar que no esté en el horario de almuerzo (12:00 - 14:00)
+         const inicioAlmuerzo = 12 * 60;
+         const finAlmuerzo = 14 * 60;
 
         // Verificar si ya existe una cita para esa fecha y hora
         const citaExistente = await QuoteModel.findOne({
@@ -219,24 +223,28 @@ export const getAvailableHoursByDate = async (req, res) => {
         });
 
         // Generar todas las horas posibles del día (de 08:00 a 17:00, cada 30 min)
-        const generarHoras = (inicio = "08:00", fin = "17:00", intervalo = 30) => {
+        const generarHoras = (inicio = "09:00", fin = "20:30", intervalo = 30) => {
             const horas = [];
             let [h, m] = inicio.split(":").map(Number);
             const [hFin, mFin] = fin.split(":").map(Number);
-
+        
             while (h < hFin || (h === hFin && m < mFin)) {
-                const hora = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-                horas.push(hora);
-
+                // Omitir el horario de almuerzo de 12:00 a 14:00
+                if (h < 12 || h >= 14) {
+                    const hora = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+                    horas.push(hora);
+                }
+        
                 m += intervalo;
                 if (m >= 60) {
                     h++;
                     m -= 60;
                 }
             }
-
+        
             return horas;
         };
+        
 
         const todasLasHoras = generarHoras();
 
