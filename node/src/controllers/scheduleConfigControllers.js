@@ -61,4 +61,19 @@ export const createScheduleConfig = async (req, res) => {
   }
 };
 
-  
+// delete schedule Config
+export const deleteScheduleConfig = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const config = await ScheduleConfig.findByPk(id);
+    if (!config) return res.status(404).json({ message: "Configuración no encontrada" });
+
+    await config.destroy();
+    res.status(200).json({ message: "Configuración eliminada correctamente" });
+  } catch (error) {
+    console.error("Error al eliminar configuración:", error);
+    res.status(500).json({ message: "Error interno del servidor" });
+  }
+};
+

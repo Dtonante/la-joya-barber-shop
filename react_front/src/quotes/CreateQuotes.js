@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +5,6 @@ import Sidebar from "../sidebar/Sidebar.js";
 import "../css/quotes/CreateQuoteCss.css";
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "react-datepicker";
-
-
 import { es } from "date-fns/locale";
 
 const URI_CREATE_QUOTE = "http://localhost:3000/api/v1/quotes";
@@ -51,7 +48,6 @@ const CreateQuotes = () => {
     fetchAvailableHours();
   }, [dateAndTimeQuote]);
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje("");
@@ -63,9 +59,13 @@ const CreateQuotes = () => {
     }
 
     try {
+      // Convertir la fecha seleccionada a un formato que respete la zona horaria local
+      const fechaFormateada = dateAndTimeQuote.toLocaleString("sv-SE").replace(" ", "T");
+      console.log("Fecha enviada sin UTC:", fechaFormateada);
+
       await axios.post(
         URI_CREATE_QUOTE,
-        { id_userFK, dateAndTimeQuote },
+        { id_userFK, dateAndTimeQuote: fechaFormateada },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMensaje("Cita creada con éxito.");
@@ -74,7 +74,7 @@ const CreateQuotes = () => {
       if (err.response) {
         const status = err.response.status;
         const mensajeServidor = err.response.data?.message;
-    
+
         if ((status === 400 || status === 409) && mensajeServidor) {
           setError(mensajeServidor);
         } else {
@@ -84,8 +84,8 @@ const CreateQuotes = () => {
         setError("Error de conexión con el servidor.");
       }
     }
-    
   };
+
 
   return (
     <div style={{ display: "flex" }}>
@@ -109,7 +109,6 @@ const CreateQuotes = () => {
             <div className="create-quotes-message success">{mensaje}</div>
           )}
 
-
           <form onSubmit={handleSubmit} className="create-quotes-form">
             <div>
               <label>Usuario</label><br />
@@ -122,16 +121,10 @@ const CreateQuotes = () => {
               {/* Campo de solo lectura que muestra la fecha y hora seleccionadas */}
               <input
                 type="text"
-                value={
-                  dateAndTimeQuote
-                    ? dateAndTimeQuote.toLocaleString("es-ES", {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })
-                    : ""
-                }
+                value={dateAndTimeQuote ? dateAndTimeQuote.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" }) : ""}
                 readOnly
               />
+
 
               <br />
               <br />
@@ -140,7 +133,7 @@ const CreateQuotes = () => {
               <DatePicker
                 selected={dateAndTimeQuote ? new Date(dateAndTimeQuote) : null}
                 onChange={(date) => {
-                  setDateAndTimeQuote(date); // YYYY-MM-DDTHH:mm
+                  setDateAndTimeQuote(date); // Establecer la fecha seleccionada
                 }}
                 dateFormat="yyyy-MM-dd HH:mm"
                 minDate={new Date()}
@@ -152,34 +145,31 @@ const CreateQuotes = () => {
 
               {availableHours.length > 0 ? (
                 <div className="available-hours-container">
-                {availableHours.map((hora, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    className="available-hour-btn"
-                    onClick={() => {
-                      if (dateAndTimeQuote) {
-                        const [hour, minute] = hora.split(":");
-                        const nuevaFecha = new Date(dateAndTimeQuote);
-                        nuevaFecha.setHours(Number(hour));
-                        nuevaFecha.setMinutes(Number(minute));
-                        nuevaFecha.setSeconds(0);
-                        nuevaFecha.setMilliseconds(0);
-                        setDateAndTimeQuote(nuevaFecha);
-                      }
-                    }}
-                  >
-                    {hora}
-                  </button>
-                ))}
-              </div>
-              
+                  {availableHours.map((hora, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      className="available-hour-btn"
+                      onClick={() => {
+                        if (dateAndTimeQuote) {
+                          const [hour, minute] = hora.split(":");
+                          const nuevaFecha = new Date(dateAndTimeQuote);
+                          nuevaFecha.setHours(Number(hour));
+                          nuevaFecha.setMinutes(Number(minute));
+                          nuevaFecha.setSeconds(0);
+                          nuevaFecha.setMilliseconds(0);
+                          setDateAndTimeQuote(nuevaFecha);
+                        }
+                      }}
+                    >
+                      {hora}
+                    </button>
+                  ))}
+                </div>
               ) : dateAndTimeQuote && !fetchError ? (
                 <p>No hay horas disponibles para esta fecha.</p>
               ) : null}
-
             </div>
-
 
             <button type="submit" className="create-quotes-button">
               Guardar Cita
@@ -193,7 +183,6 @@ const CreateQuotes = () => {
               Atrás
             </button>
           </form>
-
         </div>
       </div>
     </div>

@@ -3,6 +3,15 @@ import UserModel from "../models/userModel.js";
 import paginate from "../middlewares/paginate.js";
 import generateFilters from "../middlewares/filter.js";
 import { Op } from "sequelize";
+import { toMinutes, validateScheduleForDate } from "../controllers/utils/scheduleValidator.js";
+import { DateTime } from 'luxon';
+import ScheduleConfigModel from "../models/scheduleConfigModel.js";
+
+
+
+
+
+
 
 // Obtener todas las citas con paginación y filtros
 export const getQuotes = (req, res) => {
@@ -23,9 +32,35 @@ export const getQuotes = (req, res) => {
 };
 
 // obtener todas las citas sin paginado y filtros para el calendario
+// export const getAllQuotes = async (req, res) => {
+//     try {
+//         const quotes = await QuoteModel.findAll({
+//             include: [{
+//                 model: UserModel,
+//                 attributes: ["name", "email"]
+//             }],
+//             order: [['dateAndTimeQuote', 'ASC']]
+//         });
+
+//         res.status(200).json({ data: quotes });
+//     } catch (error) {
+//         console.error("Error al obtener todas las citas:", error);
+//         res.status(500).json({ message: "Error al obtener las citas" });
+//     }
+// };
+
 export const getAllQuotes = async (req, res) => {
     try {
+        // Obtener la fecha y hora actual en formato JS Date
+        const now = DateTime.now().toJSDate();
+
         const quotes = await QuoteModel.findAll({
+            where: {
+                dateAndTimeQuote: {
+                    [Op.gte]: now // solo citas futuras desde el momento actual
+                },
+                status: 'activa' // solo citas activas
+            },
             include: [{
                 model: UserModel,
                 attributes: ["name", "email"]
@@ -39,7 +74,6 @@ export const getAllQuotes = async (req, res) => {
         res.status(500).json({ message: "Error al obtener las citas" });
     }
 };
-
 
 // Obtener citas futuras con paginación y filtros
 export const getUpcomingQuotes = (req, res) => {
@@ -72,12 +106,6 @@ export const getUpcomingQuotes = (req, res) => {
         order: [["dateAndTimeQuote", "ASC"]]
     });
 };
-
-
-
-
-
-
 
 // Obtener una cita por ID
 export const getQuotesForID = async (req, res) => {
@@ -118,6 +146,90 @@ export const getQuotesByUser = async (req, res) => {
 };
 
 //// Crear una cita 
+// export const createQuote = async (req, res) => {
+//     try {
+//         const { id_userFK, dateAndTimeQuote } = req.body;
+
+//         if (!id_userFK || !dateAndTimeQuote) {
+//             return res.status(400).json({ message: "Todos los campos son obligatorios" });
+//         }
+
+//         // Validar si el usuario ya tiene una cita activa
+//         const citaActiva = await QuoteModel.findOne({
+//             where: {
+//                 id_userFK,
+//                 status: "activa"
+//             }
+//         });
+
+//         if (citaActiva) {
+//             return res.status(400).json({
+//                 message: "Ya tienes una cita activa. No puedes agendar otra hasta que se complete o cancele."
+//             });
+//         }
+
+
+//         // Convertir la fecha y hora a objeto Date
+//         const fechaHora = new Date(dateAndTimeQuote);
+//         const hora = fechaHora.getHours();
+//         const minutos = fechaHora.getMinutes();
+
+//         // Normalizar fechas quitando segundos y milisegundos
+//         const fechaActual = new Date();
+//         fechaActual.setSeconds(0, 0);
+//         fechaHora.setSeconds(0, 0);
+
+//         // Validar que no se pueda crear una cita en una fecha en el pasado
+//         if (fechaHora < fechaActual) {
+//             return res.status(400).json({ message: "No se puede agendar una cita en el pasado" });
+//         }
+
+//         // Validar horario laboral: entre 09:00 y 20:00
+//         const horaEnMinutos = hora * 60 + minutos;
+//         const inicioLaboral = 9 * 60;   // 09:00
+//         const finLaboral = 20 * 60;     // 20:00
+
+//         if (horaEnMinutos < inicioLaboral || horaEnMinutos >= finLaboral) {
+//             return res.status(400).json({
+//                 message: "La cita debe estar dentro del horario laboral (09:00 - 20:00)"
+//             });
+//         }
+
+//         // Validar que no esté en el horario de almuerzo (12:00 - 14:00)
+//         const inicioAlmuerzo = 12 * 60;
+//         const finAlmuerzo = 14 * 60;
+
+//         if (horaEnMinutos >= inicioAlmuerzo && horaEnMinutos < finAlmuerzo) {
+//             return res.status(400).json({
+//                 message: "No se pueden agendar citas durante el horario de almuerzo (12:00 - 14:00)"
+//             });
+//         }
+
+//         // Verificar si ya existe una cita para esa fecha y hora
+//         const citaExistente = await QuoteModel.findOne({
+//             where: { dateAndTimeQuote }
+//         });
+
+//         if (citaExistente) {
+//             return res.status(409).json({
+//                 message: "Ya hay una cita agendada para esta fecha y hora"
+//             });
+//         }
+
+//         // Crear la nueva cita
+//         const nuevaCita = await QuoteModel.create({
+//             id_userFK,
+//             dateAndTimeQuote,
+//             status: "activa" // establecer estado inicial
+//         });
+
+//         res.status(201).json({ message: "Cita creada con éxito", cita: nuevaCita });
+
+//     } catch (error) {
+//         res.status(500).json({ message: "Error al crear la cita", error: error.message });
+//     }
+// };
+
 export const createQuote = async (req, res) => {
     try {
         const { id_userFK, dateAndTimeQuote } = req.body;
@@ -140,41 +252,22 @@ export const createQuote = async (req, res) => {
             });
         }
 
-
         // Convertir la fecha y hora a objeto Date
         const fechaHora = new Date(dateAndTimeQuote);
-        const hora = fechaHora.getHours();
-        const minutos = fechaHora.getMinutes();
-
-        // Normalizar fechas quitando segundos y milisegundos
         const fechaActual = new Date();
         fechaActual.setSeconds(0, 0);
         fechaHora.setSeconds(0, 0);
 
-        // Validar que no se pueda crear una cita en una fecha en el pasado
+        // Validar que no se pueda crear una cita en el pasado
         if (fechaHora < fechaActual) {
             return res.status(400).json({ message: "No se puede agendar una cita en el pasado" });
         }
 
-        // Validar horario laboral: entre 09:00 y 20:00
-        const horaEnMinutos = hora * 60 + minutos;
-        const inicioLaboral = 9 * 60;   // 09:00
-        const finLaboral = 20 * 60;     // 20:00
-
-        if (horaEnMinutos < inicioLaboral || horaEnMinutos >= finLaboral) {
-            return res.status(400).json({
-                message: "La cita debe estar dentro del horario laboral (09:00 - 20:00)"
-            });
-        }
-
-        // Validar que no esté en el horario de almuerzo (12:00 - 14:00)
-        const inicioAlmuerzo = 12 * 60;
-        const finAlmuerzo = 14 * 60;
-
-        if (horaEnMinutos >= inicioAlmuerzo && horaEnMinutos < finAlmuerzo) {
-            return res.status(400).json({
-                message: "No se pueden agendar citas durante el horario de almuerzo (12:00 - 14:00)"
-            });
+        // 🔄 Validación dinámica usando la configuración de horarios
+        try {
+            await validateScheduleForDate(fechaHora);
+        } catch (error) {
+            return res.status(400).json({ message: error.message });
         }
 
         // Verificar si ya existe una cita para esa fecha y hora
@@ -182,7 +275,7 @@ export const createQuote = async (req, res) => {
             where: { dateAndTimeQuote }
         });
 
-        if (citaExistente) {
+        if (citaExistente && citaExistente.status !== "cancelada") {
             return res.status(409).json({
                 message: "Ya hay una cita agendada para esta fecha y hora"
             });
@@ -192,15 +285,30 @@ export const createQuote = async (req, res) => {
         const nuevaCita = await QuoteModel.create({
             id_userFK,
             dateAndTimeQuote,
-            status: "activa" // establecer estado inicial
+            status: "activa"
         });
 
-        res.status(201).json({ message: "Cita creada con éxito", cita: nuevaCita });
+        const citaLocal = {
+            ...nuevaCita.toJSON(),
+            dateAndTimeQuote: new Date(nuevaCita.dateAndTimeQuote).toLocaleString('es-CO', {
+                timeZone: 'America/Bogota',
+                hour12: false,
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        };
+
+        res.status(201).json({ message: "Cita creada con éxito", cita: citaLocal });
+
 
     } catch (error) {
         res.status(500).json({ message: "Error al crear la cita", error: error.message });
     }
 };
+
 
 
 
@@ -238,47 +346,64 @@ export const deleteQuote = async (req, res) => {
 // Traer las horas disponibles del dia seleccionado o enviado
 // export const getAvailableHoursByDate = async (req, res) => {
 //     try {
-//         const { fecha } = req.query;
+//         const { fecha, inicio, fin, excluyeAlmuerzo } = req.query;
+//         const timeZone = 'America/Bogota';
+
+//         console.log("Parametros recibidos:", { fecha, inicio, fin, excluyeAlmuerzo });
 
 //         if (!fecha) {
 //             return res.status(400).json({ message: "La fecha es requerida en el formato YYYY-MM-DD" });
 //         }
 
-//         // Rango del día completo
-//         const startOfDay = new Date(`${fecha}T00:00:00`);
-//         const endOfDay = new Date(`${fecha}T23:59:59`);
+//         const horaInicio = inicio || '09:00';
+//         const horaFin = fin || '20:00';
 
-//         // Obtener todas las citas agendadas para ese día
+//         // Usando Luxon para manejar las fechas
+//         const startOfDay = DateTime.fromISO(`${fecha}T${horaInicio}:00`, { zone: timeZone }).toJSDate();
+//         const endOfDay = DateTime.fromISO(`${fecha}T${horaFin}:59`, { zone: timeZone }).toJSDate();
+
 //         const citasDelDia = await QuoteModel.findAll({
 //             where: {
 //                 dateAndTimeQuote: {
 //                     [Op.between]: [startOfDay, endOfDay]
 //                 },
-//                 status: "activa"
+//                 // Este filtro ahora solo se usa para obtener citas activas o canceladas
+//                 status: {
+//                     [Op.in]: ['activa', 'cancelada']
+//                 }
 //             }
 //         });
 
-//          // Extraer las horas ocupadas (normalizadas a HH:MM)
-//          const horasOcupadas = citasDelDia.map(cita => {
-//             const date = new Date(cita.dateAndTimeQuote);
-//             const hh = String(date.getHours()).padStart(2, "0");
-//             const mm = String(date.getMinutes()).padStart(2, "0");
-//             return `${hh}:${mm}`;
-//         });
+//         console.log("citas del dia:", citasDelDia);
 
-//         // Generar todas las horas posibles del día (de 09:00 a 20:00, cada 30 min)
+//         // Obtener las horas ocupadas de las citas
+//         const horasOcupadas = citasDelDia.map(cita => {
+//             // Usar fromSQL para convertir el formato de la fecha
+//             const fechaUtc = DateTime.fromSQL(cita.dateAndTimeQuote, { zone: 'utc' });
+//             const fechaLocal = fechaUtc.setZone(timeZone);
+//             const horaFormateada = fechaLocal.toFormat('HH:mm');
+//             console.log("hora formateada", horaFormateada);
+            
+//             // Si la cita está cancelada, la hora debería ser disponible
+//             if (cita.status === 'cancelada') {
+//                 return null; // No considerar como hora ocupada
+//             }
+//             return horaFormateada;
+//         }).filter(hora => hora !== null); // Filtrar las citas canceladas
+
+//         console.log("horas ocupadas", horasOcupadas);
+
+//         // Función para generar las horas disponibles
 //         const generarHoras = (inicio = "09:00", fin = "20:30", intervalo = 30) => {
 //             const horas = [];
 //             let [h, m] = inicio.split(":").map(Number);
 //             const [hFin, mFin] = fin.split(":").map(Number);
 
 //             while (h < hFin || (h === hFin && m < mFin)) {
-//                 // Omitir el horario de almuerzo de 12:00 a 14:00
-//                 if (h < 12 || h >= 14) {
-//                     const hora = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-//                     horas.push(hora);
+//                 if (!(excluyeAlmuerzo && h >= 12 && h < 14)) {
+//                     const horaGenerada = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+//                     horas.push(horaGenerada);
 //                 }
-
 //                 m += intervalo;
 //                 if (m >= 60) {
 //                     h++;
@@ -289,11 +414,15 @@ export const deleteQuote = async (req, res) => {
 //             return horas;
 //         };
 
-
-//         const todasLasHoras = generarHoras();
+//         const todasLasHoras = generarHoras(horaInicio, horaFin);
 
 //         // Filtrar las horas disponibles
-//         const horasDisponibles = todasLasHoras.filter(hora => !horasOcupadas.includes(hora));
+//         const horasDisponibles = todasLasHoras.filter(horaGenerada => {
+//             const horaGeneradaDate = DateTime.fromISO(`${fecha}T${horaGenerada}:00`, { zone: timeZone });
+//             const horaGeneradaFormateada = horaGeneradaDate.toFormat('HH:mm');
+
+//             return !horasOcupadas.includes(horaGeneradaFormateada);
+//         });
 
 //         res.status(200).json({ fecha, horasDisponibles });
 //     } catch (error) {
@@ -302,54 +431,70 @@ export const deleteQuote = async (req, res) => {
 //     }
 // };
 
-// Traer las horas disponibles del dia seleccionado o enviado
+
 export const getAvailableHoursByDate = async (req, res) => {
     try {
-        const { fecha, inicio, fin, excluyeAlmuerzo } = req.query;
+        const { fecha } = req.query;
+        const timeZone = 'America/Bogota';
 
         if (!fecha) {
             return res.status(400).json({ message: "La fecha es requerida en el formato YYYY-MM-DD" });
         }
 
-        // Si no se pasa un rango personalizado, usamos el predeterminado de 09:00 a 20:00
-        const horaInicio = inicio || '09:00';
-        const horaFin = fin || '20:00';
+        // Buscar configuración del día
+        let config = await ScheduleConfigModel.findOne({
+            where: { date: fecha }
+        });
 
-        // Si se pasa un rango de horas, generamos las horas en ese rango
-        const startOfDay = new Date(`${fecha}T${horaInicio}:00`);
-        const endOfDay = new Date(`${fecha}T${horaFin}:59`);
+        if (!config) {
+            config = await ScheduleConfigModel.findOne({ where: { date: null } });
+        }
 
-        // Obtener todas las citas agendadas para ese día
+        if (!config) {
+            return res.status(400).json({ message: "No hay configuración de horario para ese día" });
+        }
+
+        const { workStart, workEnd, lunchStart, lunchEnd } = config;
+
+        const horaInicio = workStart;
+        const horaFin = workEnd;
+
+        const startOfDay = DateTime.fromISO(`${fecha}T${horaInicio}:00`, { zone: timeZone }).toJSDate();
+        const endOfDay = DateTime.fromISO(`${fecha}T${horaFin}:59`, { zone: timeZone }).toJSDate();
+
+        // Obtener las citas activas o canceladas
         const citasDelDia = await QuoteModel.findAll({
             where: {
                 dateAndTimeQuote: {
                     [Op.between]: [startOfDay, endOfDay]
                 },
-                status: "activa"
+                status: {
+                    [Op.in]: ['activa', 'cancelada']
+                }
             }
         });
 
-        // Extraer solo las horas ocupadas
         const horasOcupadas = citasDelDia.map(cita => {
-            const hora = new Date(cita.dateAndTimeQuote).toTimeString().substring(0, 5); // formato HH:MM
-            return hora;
-        });
+            const fechaUtc = DateTime.fromSQL(cita.dateAndTimeQuote, { zone: 'utc' });
+            const fechaLocal = fechaUtc.setZone(timeZone);
+            const horaFormateada = fechaLocal.toFormat('HH:mm');
+            return cita.status === 'cancelada' ? null : horaFormateada;
+        }).filter(hora => hora !== null);
 
-        // Generar todas las horas posibles del día
-        const generarHoras = (inicio = "09:00", fin = "20:30", intervalo = 30) => {
+        const generarHoras = (inicio, fin, intervalo = 30) => {
             const horas = [];
             let [h, m] = inicio.split(":").map(Number);
             const [hFin, mFin] = fin.split(":").map(Number);
 
-            while (h < hFin || (h === hFin && m < mFin)) {
-                // Excluir el horario de almuerzo si se solicita
-                if (excluyeAlmuerzo && (h === 12 && m >= 0) && (h === 14 && m <= 0)) {
-                    // No agregar las horas del almuerzo (12:00 - 14:00)
-                } else {
-                    const hora = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-                    horas.push(hora);
-                }
+            const lunchStartMin = toMinutes(lunchStart);
+            const lunchEndMin = toMinutes(lunchEnd);
 
+            while (h < hFin || (h === hFin && m < mFin)) {
+                const totalMin = h * 60 + m;
+                if (!(totalMin >= lunchStartMin && totalMin < lunchEndMin)) {
+                    const horaGenerada = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+                    horas.push(horaGenerada);
+                }
                 m += intervalo;
                 if (m >= 60) {
                     h++;
@@ -362,15 +507,20 @@ export const getAvailableHoursByDate = async (req, res) => {
 
         const todasLasHoras = generarHoras(horaInicio, horaFin);
 
-        // Filtrar las horas disponibles
-        const horasDisponibles = todasLasHoras.filter(hora => !horasOcupadas.includes(hora));
+        const horasDisponibles = todasLasHoras.filter(horaGenerada => {
+            const horaGeneradaDate = DateTime.fromISO(`${fecha}T${horaGenerada}:00`, { zone: timeZone });
+            const horaFormateada = horaGeneradaDate.toFormat('HH:mm');
+            return !horasOcupadas.includes(horaFormateada);
+        });
 
         res.status(200).json({ fecha, horasDisponibles });
+
     } catch (error) {
         console.error("Error al obtener horas disponibles:", error);
         res.status(500).json({ message: "Error al obtener horas disponibles" });
     }
 };
+
 
 
 
