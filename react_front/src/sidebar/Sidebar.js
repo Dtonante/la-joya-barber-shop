@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../css/sidebar/SidebarCss.css";
-import { FaHome, FaUser, FaCalendarAlt, FaSignOutAlt, FaClipboard } from "react-icons/fa";
+import { FaHome, FaUser, FaCalendarAlt, FaSignOutAlt, FaClipboard, FaClock  } from "react-icons/fa";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
     const location = useLocation();
@@ -13,6 +13,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { to: "/homeClients", label: "Inicio", icon: <FaHome /> },
         { to: "/quoteUser", label: "Mis Citas", icon: <FaClipboard /> },
         { to: "/listUsers", label: "Usuarios", icon: <FaUser /> },
+        { to: "/scheduleConfig", label: "Cronograma personal", icon: <FaClock /> },
         { to: "/listQuotes", label: "Citas", icon: <FaCalendarAlt /> },
         { to: "/createQuote", label: "Agendar Cita", icon: <FaClipboard /> },
         {

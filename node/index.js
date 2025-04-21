@@ -11,6 +11,8 @@ import { autoMarkAsCompleted } from "./src/jobs/autoMarkAsCompleted.js";
 import usersRoutes from "./src/routes/usersRoutes.js";
 import rolesRoutes from "./src/routes/rolesRoutes.js";
 import quotesRoutes from "./src/routes/quotesRoutes.js";
+import scheduleConfigRouters from "./src/routes/scheduleConfigRoutes.js"
+
 
 
 // Modelos y asociaciones
@@ -27,6 +29,7 @@ app.use(morgan("combined"));
 app.use("/api/v1/roles", rolesRoutes);
 app.use("/api/v1/users", usersRoutes);
 app.use("/api/v1/quotes", quotesRoutes);
+app.use("/api/v1/scheduleConfig", scheduleConfigRouters);
 
 // Middleware de ruta no encontrada
 app.use((req, res) => res.status(404).json({ error: "Ruta no encontrada" }));

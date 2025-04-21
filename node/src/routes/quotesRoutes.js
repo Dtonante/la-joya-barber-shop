@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getQuotes, getQuotesForID, createQuote, updateQuote, deleteQuote, getUpcomingQuotes, getAllQuotes, getAvailableHoursByDate, getQuotesByUser } from "../controllers/quotesControllers.js";
+import { getQuotes, getQuotesForID, createQuote, updateQuote, deleteQuote, getUpcomingQuotes, getAllQuotes, getAvailableHoursByDate, getQuotesByUser, cancelQuote } from "../controllers/quotesControllers.js";
 import verificarToken from "../middlewares/authMiddleware.js";
 
 const router = Router();
@@ -13,6 +13,7 @@ router.get("/upcoming/update", verificarToken, getUpcomingQuotes);
 router.get("/all/calendar", verificarToken, getAllQuotes); 
 router.get("/disponibles/horas", verificarToken, getAvailableHoursByDate);
 router.get("/all/:id_userFK", getQuotesByUser);
+router.put("/cancel/cancelCustomerQuote/:id_quotePK", verificarToken, cancelQuote)
 
 
 

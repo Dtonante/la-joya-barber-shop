@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar.js";
 import QuotesCalendar from "./QuotesCalendar.js";
 import "../css/user/ShowUsersCss.css";
+import CancelButtonQuote from "../components/cancelButtonQuote/CancelButtonQuote.js";
 
 const URI_QUOTES_UPCOMING_UPDATE = "http://localhost:3000/api/v1/quotes/upcoming/update";
 
@@ -142,7 +143,16 @@ const CompShowQuotes = () => {
                                                         <Link to={`/editar-cita/${quote.id_quotePK}`} className="btn btn-info">
                                                             Editar
                                                         </Link>
+
+                                                        {quote.status === "activa" && (
+                                                            <CancelButtonQuote
+                                                                idQuote={quote.id_quotePK}
+                                                                onCancelSuccess={() => getQuotes()}
+                                                            />
+                                                        )}
+
                                                     </td>
+
                                                 </tr>
                                             ))
                                         ) : (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../sidebar/Sidebar";
+import CancelButtonQuote from "../components/cancelButtonQuote/CancelButtonQuote";
 
 const CompShowCitasUsuario = () => {
     const [citas, setCitas] = useState([]);
@@ -73,6 +74,7 @@ const CompShowCitasUsuario = () => {
                             <th>ID Cita</th>
                             <th>Fecha y Hora</th>
                             <th>Estado</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,6 +84,14 @@ const CompShowCitasUsuario = () => {
                                     <td>{cita.id_quotePK}</td>
                                     <td>{formatDate(cita.dateAndTimeQuote)}</td>
                                     <td>{cita.status}</td>
+                                    <td>
+                                        {cita.status === "activa" && (
+                                            <CancelButtonQuote
+                                                idQuote={cita.id_quotePK}
+                                                onCancelSuccess={() => fetchCitas(paginaActual)}
+                                            />
+                                        )}
+                                    </td>
                                 </tr>
                             ))
                         ) : (
