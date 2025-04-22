@@ -1,6 +1,34 @@
 // controllers/scheduleConfigController.js
 import ScheduleConfig from "../models/scheduleConfigModel.js";
 
+// mostrar configuracion par aun dia
+// export const getScheduleConfigByDate = async (req, res) => {
+//   try {
+//     const { date } = req.query;
+
+//     if (!date) {
+//       return res.status(400).json({ message: "Date is required (YYYY-MM-DD)" });
+//     }
+
+//     // Check if there's a custom config for that date
+//     let config = await ScheduleConfig.findOne({ where: { date } });
+
+//     // If no config exists, use default config (date = null)
+//     if (!config) {
+//       config = await ScheduleConfig.findOne({ where: { date: null } });
+//     }
+
+//     if (!config) {
+//       return res.status(404).json({ message: "No default or custom schedule config found" });
+//     }
+
+//     res.status(200).json(config);
+//   } catch (error) {
+//     console.error("Error fetching schedule config:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
 export const getScheduleConfigByDate = async (req, res) => {
   try {
     const { date } = req.query;
@@ -12,21 +40,20 @@ export const getScheduleConfigByDate = async (req, res) => {
     // Check if there's a custom config for that date
     let config = await ScheduleConfig.findOne({ where: { date } });
 
-    // If no config exists, use default config (date = null)
-    if (!config) {
-      config = await ScheduleConfig.findOne({ where: { date: null } });
+    // If no config exists for the specific date, return an error
+    if (config) {
+      return res.status(200).json(config);
     }
 
-    if (!config) {
-      return res.status(404).json({ message: "No default or custom schedule config found" });
-    }
-
-    res.status(200).json(config);
+    // If no custom config exists for the date, return a not found response
+    return res.status(404).json({ message: "No schedule config found for the specified date" });
+    
   } catch (error) {
     console.error("Error fetching schedule config:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 // create schedule Config
 export const createScheduleConfig = async (req, res) => {
