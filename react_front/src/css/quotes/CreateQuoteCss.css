@@ -1,141 +1,46 @@
-/* Contenedor principal de la vista createQuotes */
-.create-quotes-container {
-    max-width: 700px;
-    margin: auto;
-    background-color: #ffffff;
-    padding: 40px 30px;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  /* Título */
-  .create-quotes-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 30px;
-    text-align: center;
-    color: #333;
-  }
-  
-  /* Formulario */
-  .create-quotes-form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .create-quotes-form label {
-    font-weight: 600;
-    margin-bottom: 5px;
-    color: #444;
-  }
-  
-  .create-quotes-form input {
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.3s;
-  }
-  
-  .create-quotes-form input:focus {
-    border-color: #007bff;
-  }
-  
-  /* Botones */
-  .create-quotes-button {
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-    width: 100%;
-  }
-  
-  .create-quotes-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .create-quotes-back {
-    margin-top: 10px;
-    padding: 10px;
-    background-color: #6c757d;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    width: 100%;
-  }
-  
-  .create-quotes-back:hover {
-    background-color: #5a6268;
-  }
-  
-  /* Mensajes */
-  .create-quotes-message {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 14px;
-  }
-  
-  .create-quotes-message.success {
-    background-color: #d1e7dd;
-    color: #0f5132;
-  }
-  
-  .create-quotes-message.error {
-    background-color: #f8d7da;
-    color: #842029;
-  }
-  
-  
-  /* Responsive */
-  @media (max-width: 600px) {
-    .create-quotes-container {
-      padding: 30px 20px;
-    }
-  
-    .create-quotes-title {
-      font-size: 20px;
-    }
-  
-    .create-quotes-button,
-    .create-quotes-back {
-      font-size: 15px;
-    }
-  }
+.custom-datepicker {
+  font-size: 1.5rem;
+  width: 100% !important;
+}
 
-  .available-hours-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  
-  .available-hour-btn {
-    background-color: #e0f0ff;
-    border: 1px solid #007bff;
-    border-radius: 5px;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .available-hour-btn:hover {
-    background-color: #cce4ff;
-  }
-  
-    
-  
+.custom-datepicker .react-datepicker__month-container {
+  width: 100%;
+}
+
+/* Hace que el header (días de la semana) use todo el espacio */
+.custom-datepicker .react-datepicker__day-names {
+  display: flex;
+  justify-content: space-between;
+}
+
+.custom-datepicker .react-datepicker__day-name,
+.custom-datepicker .react-datepicker__day {
+  flex: 1; /* Que se expandan igualmente */
+  text-align: center;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Header del mes */
+.custom-datepicker .react-datepicker__header {
+  background-color: #205afad3;
+  color: white;
+}
+
+/* Día al pasar el mouse */
+.custom-datepicker .react-datepicker__day:hover {
+  background-color: #3f51b5;
+  color: rgb(185, 185, 185);
+}
+.custom-datepicker .react-datepicker__week {
+  display: flex !important;
+  justify-content: space-between;
+}
+
+.custom-datepicker .react-datepicker__day {
+  flex: 1 !important;
+  text-align: center;
+  padding: 0.5rem 0;
+  box-sizing: border-box;
+  font-size: 1.5rem;
+}
