@@ -3,7 +3,15 @@ import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import axios from "axios";
 import "../css/quotes/QuotesCalendarCss.css";
-import { Box, Typography, Paper, Grid, List, ListItem, ListItemText } from "@mui/material";
+import {
+    Box,
+    Typography,
+    Paper,
+    Grid,
+    List,
+    ListItem,
+    ListItemText,
+} from "@mui/material";
 
 const URI_GET_QUOTES_CALENDAR = "http://localhost:3000/api/v1/quotes/all/calendar";
 
@@ -54,49 +62,16 @@ const QuotesCalendar = () => {
     };
 
     return (
-        <Box
-            sx={{
-                maxWidth: 900,
-                margin: "10px auto",
-                padding: 3,
-                display: "flex",
-                flexDirection: "column",
-                gap: 3
-            }}
-        >
+
+        <Box sx={{ maxWidth: 1300, margin: "20px auto", padding: 2 }}>
             <Typography variant="h4" align="center" gutterBottom>
                 Calendario de Citas
             </Typography>
 
-            <Grid
-                container
-                spacing={2}
-                justifyContent="center"
-                alignItems="flex-start"
-            >
-                {/* Leyenda */}
-                <Grid item xs={12} sm={4}>
-                    <Paper elevation={3} sx={{ padding: 2 }}>
-                        <Typography variant="h6" gutterBottom>
-                            Leyenda
-                        </Typography>
-                        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                            <li style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-                                <span className="legend-color orange-day" /> 1 a 5 citas
-                            </li>
-                            <li style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-                                <span className="legend-color pink-day" /> 6 a 10 citas
-                            </li>
-                            <li style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-                                <span className="legend-color green-day" /> 11 o más citas
-                            </li>
-                        </ul>
-                    </Paper>
-                </Grid>
-
-                {/* Calendario */}
-                <Grid item xs={12} sm={8}>
-                    <Paper elevation={3} sx={{ padding: 2 }}>
+            <Box elevation={3} sx={{ padding: 3, borderRadius: 4, justifyItems: "center" }}>
+                <Grid container spacing={3}>
+                    {/* Calendario */}
+                    <Grid item xs={12} md={8}>
                         <Calendar
                             onChange={handleDateChange}
                             tileClassName={({ date, view }) => {
@@ -111,18 +86,56 @@ const QuotesCalendar = () => {
                                 }
                             }}
                         />
-                    </Paper>
-                </Grid>
-            </Grid>
+                    </Grid>
 
-            {/* Lista de Citas del Día */}
+                    {/* Leyenda */}
+                    
+                    <Grid item xs={12} md={4}>
+                        <Paper elevation={1} sx={{ padding: 2, borderRadius: 2 }}>
+                            <Typography variant="h6" gutterBottom>
+                                Leyenda
+                            </Typography>
+                            <Box component="ul" sx={{ listStyle: "none", padding: 0, margin: 0 }}>
+                                {[
+                                    { label: "1 a 5 citas", color: "#c4811d" },
+                                    { label: "6 a 10 citas", color: "#f48fb1" },
+                                    { label: "11 o más citas", color: "#81c784" },
+                                ].map((item, index) => (
+                                    <Box
+                                        key={index}
+                                        component="li"
+                                        sx={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            marginBottom: 1,
+                                            fontSize: "0.95rem",
+                                        }}
+                                    >
+                                        <Box
+                                            sx={{
+                                                width: 16,
+                                                height: 16,
+                                                borderRadius: "50%",
+                                                backgroundColor: item.color,
+                                                marginRight: 1,
+                                            }}
+                                        />
+                                        {item.label}
+                                    </Box>
+                                ))}
+                            </Box>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Box>
+
+            {/* Lista de citas del día */}
             <Box mt={4}>
                 <Typography variant="h5" gutterBottom>
                     Citas del día
                 </Typography>
-
                 {selectedDateQuotes.length > 0 ? (
-                    <Paper elevation={2} sx={{ padding: 2 }}>
+                    <Paper elevation={2} sx={{ padding: 2, borderRadius: 2 }}>
                         <List>
                             {selectedDateQuotes.map((quote) => (
                                 <ListItem key={quote.id_quotePK}>
@@ -143,6 +156,97 @@ const QuotesCalendar = () => {
             </Box>
         </Box>
     );
+
+    // return (
+    //     <Box
+    //         sx={{
+    //             maxWidth: 900,
+    //             margin: "10px auto",
+    //             padding: 3,
+    //             display: "flex",
+    //             flexDirection: "column",
+    //             gap: 3
+    //         }}
+    //     >
+    //         <Typography variant="h4" align="center" gutterBottom>
+    //             Calendario de Citas
+    //         </Typography>
+
+    //         <Grid
+    //             container
+    //             spacing={2}
+    //             justifyContent="center"
+    //             alignItems="flex-start"
+    //         >
+
+    //             {/* Calendario */}
+    //             <Grid item xs={12} md={8}>
+
+    //                 <Calendar
+    //                     onChange={handleDateChange}
+    //                     tileClassName={({ date, view }) => {
+    //                         if (view === "month") {
+    //                             const dateStr = date.toLocaleDateString("en-CA");
+    //                             const count = quoteCountsByDate[dateStr] || 0;
+
+    //                             if (count === 0) return "yellow-day";
+    //                             if (count >= 1 && count <= 5) return "orange-day";
+    //                             if (count >= 6 && count <= 10) return "pink-day";
+    //                             if (count >= 11) return "green-day";
+    //                         }
+    //                     }}
+    //                 />
+    //             </Grid>
+
+    //             {/* Leyenda */}
+    //             <Grid item xs={12} md={4}>
+    //                 <Paper elevation={3} sx={{ padding: 2 }}>
+    //                     <Typography variant="h6" gutterBottom>
+    //                         Leyenda
+    //                     </Typography>
+    //                     <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+    //                         <li style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+    //                             <span className="legend-color orange-day" /> 1 a 5 citas
+    //                         </li>
+    //                         <li style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+    //                             <span className="legend-color pink-day" /> 6 a 10 citas
+    //                         </li>
+    //                         <li style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+    //                             <span className="legend-color green-day" /> 11 o más citas
+    //                         </li>
+    //                     </ul>
+    //                 </Paper>
+    //             </Grid>
+    //         </Grid>
+
+    //         {/* Lista de Citas del Día */}
+    //         <Box mt={4}>
+    //             <Typography variant="h5" gutterBottom>
+    //                 Citas del día
+    //             </Typography>
+
+    //             {selectedDateQuotes.length > 0 ? (
+    //                 <Paper elevation={2} sx={{ padding: 2 }}>
+    //                     <List>
+    //                         {selectedDateQuotes.map((quote) => (
+    //                             <ListItem key={quote.id_quotePK}>
+    //                                 <ListItemText
+    //                                     primary={`👤 ${quote.tbl_user?.name}`}
+    //                                     secondary={`🕒 ${new Date(quote.dateAndTimeQuote).toLocaleTimeString([], {
+    //                                         hour: "2-digit",
+    //                                         minute: "2-digit",
+    //                                     })}`}
+    //                                 />
+    //                             </ListItem>
+    //                         ))}
+    //                     </List>
+    //                 </Paper>
+    //             ) : (
+    //                 <Typography variant="body1">No hay citas para este día.</Typography>
+    //             )}
+    //         </Box>
+    //     </Box>
+    // );
 
 
     // return (
@@ -231,50 +335,6 @@ const QuotesCalendar = () => {
     //             )}
     //         </Box>
     //     </Box>
-    // );
-
-    // return (
-    //     <div className="calendar-container">
-    //         <h2>Calendario de Citas</h2>
-    //         <div className="calendar-wrapper">
-    //             <div className="calendar-legend">
-    //                 <h4>Leyenda</h4>
-    //                 <ul>
-    //                     <li><span className="legend-color orange-day" /> 1 a 5 citas</li>
-    //                     <li><span className="legend-color pink-day" /> 6 a 10 citas</li>
-    //                     <li><span className="legend-color green-day" /> 11 o más citas</li>
-    //                 </ul>
-    //             </div>
-
-    //             <Calendar onChange={handleDateChange}
-    //                 tileClassName={({ date, view }) => {
-    //                     if (view === 'month') {
-    //                         const dateStr = date.toLocaleDateString("en-CA");
-    //                         const count = quoteCountsByDate[dateStr] || 0;
-
-    //                         if (count === 0) return 'yellow-day';
-    //                         if (count >= 1 && count <= 5) return 'orange-day';
-    //                         if (count >= 6 && count <= 10) return 'pink-day';
-    //                         if (count >= 11) return 'green-day';
-    //                     }
-    //                 }} />
-    //         </div>
-
-    //         <div className="quote-list">
-    //             <h3>Citas del día</h3>
-    //             {selectedDateQuotes.length > 0 ? (
-    //                 <ul>
-    //                     {selectedDateQuotes.map((quote) => (
-    //                         <li key={quote.id_quotePK}>
-    //                             👤 {quote.tbl_user?.name} — 🕒 {new Date(quote.dateAndTimeQuote).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-    //                         </li>
-    //                     ))}
-    //                 </ul>
-    //             ) : (
-    //                 <p>No hay citas para este día.</p>
-    //             )}
-    //         </div>
-    //     </div>
     // );
 
 };

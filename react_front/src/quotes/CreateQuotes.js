@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar.js";
 import "../css/quotes/CreateQuoteCss.css";
 import "react-datepicker/dist/react-datepicker.css";
-import DatePicker from "react-datepicker";
-import { es } from "date-fns/locale";
 import { Box, Typography, TextField, Button, Paper, Grid, Alert, IconButton } from "@mui/material";
 import { CalendarToday } from "@mui/icons-material";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+
 
 const URI_CREATE_QUOTE = "http://localhost:3000/api/v1/quotes";
 
@@ -98,7 +99,7 @@ const CreateQuotes = () => {
         sx={{
           marginLeft: sidebarAbierto ? "200px" : "-5px",
           transition: "margin-left 0.3s",
-          padding: 4,
+          padding: 2,
           width: "100%",
         }}
       >
@@ -162,17 +163,28 @@ const CreateQuotes = () => {
               variant="outlined"
             />
 
-            <Box sx={{ position: "relative", width: "100%", height: "auto" }}>
-              <DatePicker
-                selected={dateAndTimeQuote ? new Date(dateAndTimeQuote) : null}
-                onChange={(date) => setDateAndTimeQuote(date)}
-                dateFormat="yyyy-MM-dd HH:mm"
+            <Box sx={{ position: "relative", width: "100%", height: "auto", justifyItems: "center" }}>
+
+              <Calendar
+                className="react-calendar"
+                locale="es-ES"
+                onChange={(date) => {
+                  // Mantenemos la hora si ya se había seleccionado
+                  if (dateAndTimeQuote) {
+                    const selectedDate = new Date(date);
+                    selectedDate.setHours(dateAndTimeQuote.getHours());
+                    selectedDate.setMinutes(dateAndTimeQuote.getMinutes());
+                    selectedDate.setSeconds(0);
+                    selectedDate.setMilliseconds(0);
+                    setDateAndTimeQuote(selectedDate);
+                  } else {
+                    setDateAndTimeQuote(new Date(date));
+                  }
+                }}
+                value={dateAndTimeQuote}
                 minDate={new Date()}
-                locale={es}
-                inline
-                customInput={<TextField fullWidth sx={{ fontSize: '1.2rem' }} />}
-                calendarClassName="custom-datepicker" // Clase CSS personalizada
               />
+
             </Box>
 
             <Typography variant="subtitle1" fontWeight="bold" mt={1}>
@@ -218,235 +230,6 @@ const CreateQuotes = () => {
     </Box>
   );
 
-  // return (
-  //   <Box sx={{ display: "flex" }}>
-  //     <Sidebar isOpen={sidebarAbierto} toggleSidebar={toggleSidebar} />
-
-  //     <Box
-  //       sx={{
-  //         marginLeft: sidebarAbierto ? "200px" : "-5px",
-  //         transition: "margin-left 0.3s",
-  //         padding: 4,
-  //         width: "100%",
-  //       }}
-  //     >
-  //       <Paper
-  //         elevation={6}
-  //         sx={{
-  //           maxWidth: 700,
-  //           margin: "auto",
-  //           padding: 4,
-  //           borderRadius: 3,
-  //         }}
-  //       >
-  //         <Typography variant="h5" align="center" gutterBottom fontWeight="bold">
-  //           Crear Cita
-  //         </Typography>
-
-  //         {error && (
-  //           <Alert severity="error" sx={{ mb: 2 }}>
-  //             {error}
-  //           </Alert>
-  //         )}
-
-  //         {mensaje && (
-  //           <Alert severity="success" sx={{ mb: 2 }}>
-  //             {mensaje}
-  //           </Alert>
-  //         )}
-
-  //         <Box
-  //           component="form"
-  //           onSubmit={handleSubmit}
-  //           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-  //         >
-  //           <TextField
-  //             label="Usuario"
-  //             value={name_user}
-  //             fullWidth
-  //             disabled
-  //           />
-
-  //           <TextField
-  //             label="Fecha y Hora"
-  //             value={
-  //               dateAndTimeQuote
-  //                 ? dateAndTimeQuote.toLocaleString("es-ES", {
-  //                   dateStyle: "short",
-  //                   timeStyle: "short",
-  //                 })
-  //                 : ""
-  //             }
-  //             fullWidth
-  //             InputProps={{
-  //               readOnly: true,
-  //             }}
-  //           />
-
-  //           <Box
-  //             sx={{
-  //               transform: "scale(1.3)",         // Ajusta el tamaño
-  //               transformOrigin: "top left",     // Que crezca desde la esquina
-  //               mb: 4,                            // Agrega espacio debajo para no tapar
-  //             }}
-  //           >
-  //             <DatePicker
-  //               selected={dateAndTimeQuote ? new Date(dateAndTimeQuote) : null}
-  //               onChange={(date) => setDateAndTimeQuote(date)}
-  //               dateFormat="yyyy-MM-dd HH:mm"
-  //               minDate={new Date()}
-  //               locale={es}
-  //               inline
-  //             />
-  //           </Box>
-
-
-  //           <Typography variant="subtitle1" fontWeight="bold" mt={1}>
-  //             Horas disponibles
-  //           </Typography>
-
-  //           {fetchError && <Alert severity="error">{fetchError}</Alert>}
-
-  //           {availableHours.length > 0 ? (
-  //             <Grid container spacing={1}>
-  //               {availableHours.map((hora, index) => (
-  //                 <Grid item key={index}>
-  //                   <Button
-  //                     variant="outlined"
-  //                     size="small"
-  //                     onClick={() => {
-  //                       if (dateAndTimeQuote) {
-  //                         const [hour, minute] = hora.split(":");
-  //                         const nuevaFecha = new Date(dateAndTimeQuote);
-  //                         nuevaFecha.setHours(Number(hour));
-  //                         nuevaFecha.setMinutes(Number(minute));
-  //                         nuevaFecha.setSeconds(0);
-  //                         nuevaFecha.setMilliseconds(0);
-  //                         setDateAndTimeQuote(nuevaFecha);
-  //                       }
-  //                     }}
-  //                   >
-  //                     {hora}
-  //                   </Button>
-  //                 </Grid>
-  //               ))}
-  //             </Grid>
-  //           ) : dateAndTimeQuote && !fetchError ? (
-  //             <Typography>No hay horas disponibles para esta fecha.</Typography>
-  //           ) : null}
-
-  //           <Button variant="contained" color="primary" type="submit" fullWidth>
-  //             Guardar Cita
-  //           </Button>
-
-
-  //         </Box>
-  //       </Paper>
-  //     </Box>
-  //   </Box>
-  // );
-
-
-  // return (
-  //   <div style={{ display: "flex" }}>
-  //     <Sidebar isOpen={sidebarAbierto} toggleSidebar={toggleSidebar} />
-
-  //     <div
-  //       style={{
-  //         marginLeft: sidebarAbierto ? "200px" : "-5px",
-  //         transition: "margin-left 0.3s",
-  //         padding: "20px",
-  //         width: "100%",
-  //       }}
-  //     >
-  //       <div className="create-quotes-container">
-  //         <h2 className="create-quotes-title">Crear Cita</h2>
-
-  //         {error && (
-  //           <div className="create-quotes-message error">{error}</div>
-  //         )}
-  //         {mensaje && (
-  //           <div className="create-quotes-message success">{mensaje}</div>
-  //         )}
-
-  //         <form onSubmit={handleSubmit} className="create-quotes-form">
-  //           <div>
-  //             <label>Usuario</label><br />
-  //             <input type="text" value={name_user} disabled />
-  //           </div>
-
-  //           <div>
-  //             <label>Fecha y Hora</label><br />
-
-  //             {/* Campo de solo lectura que muestra la fecha y hora seleccionadas */}
-  //             <input
-  //               type="text"
-  //               value={dateAndTimeQuote ? dateAndTimeQuote.toLocaleString("es-ES", { dateStyle: "short", timeStyle: "short" }) : ""}
-  //               readOnly
-  //             />
-
-
-  //             <br />
-  //             <br />
-
-  //             {/* Calendario visual */}
-  //             <DatePicker
-  //               selected={dateAndTimeQuote ? new Date(dateAndTimeQuote) : null}
-  //               onChange={(date) => {
-  //                 setDateAndTimeQuote(date); // Establecer la fecha seleccionada
-  //               }}
-  //               dateFormat="yyyy-MM-dd HH:mm"
-  //               minDate={new Date()}
-  //               locale={es}
-  //               inline
-  //             />
-  //             <h3>Horas disponibles</h3>
-  //             {fetchError && <div style={{ color: "red" }}>{fetchError}</div>}
-
-  //             {availableHours.length > 0 ? (
-  //               <div className="available-hours-container">
-  //                 {availableHours.map((hora, index) => (
-  //                   <button
-  //                     key={index}
-  //                     type="button"
-  //                     className="available-hour-btn"
-  //                     onClick={() => {
-  //                       if (dateAndTimeQuote) {
-  //                         const [hour, minute] = hora.split(":");
-  //                         const nuevaFecha = new Date(dateAndTimeQuote);
-  //                         nuevaFecha.setHours(Number(hour));
-  //                         nuevaFecha.setMinutes(Number(minute));
-  //                         nuevaFecha.setSeconds(0);
-  //                         nuevaFecha.setMilliseconds(0);
-  //                         setDateAndTimeQuote(nuevaFecha);
-  //                       }
-  //                     }}
-  //                   >
-  //                     {hora}
-  //                   </button>
-  //                 ))}
-  //               </div>
-  //             ) : dateAndTimeQuote && !fetchError ? (
-  //               <p>No hay horas disponibles para esta fecha.</p>
-  //             ) : null}
-  //           </div>
-
-  //           <button type="submit" className="create-quotes-button">
-  //             Guardar Cita
-  //           </button>
-
-  //           <button
-  //             type="button"
-  //             onClick={() => navigate("/")}
-  //             className="create-quotes-back"
-  //           >
-  //             Atrás
-  //           </button>
-  //         </form>
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default CreateQuotes;

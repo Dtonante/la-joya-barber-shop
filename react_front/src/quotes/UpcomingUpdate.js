@@ -108,7 +108,7 @@ const CompShowQuotes = () => {
                 <Box
                     sx={{
                         width: "100%", // Asegura que el contenedor ocupe todo el ancho disponible
-                        maxWidth: "900px", // Máximo ancho del contenedor
+                        maxWidth: "1500px", // Máximo ancho del contenedor
                         padding: 3, // Padding alrededor
                         backgroundColor: "#fff", // Fondo blanco
                         borderRadius: 2, // Bordes redondeados
@@ -173,7 +173,7 @@ const CompShowQuotes = () => {
                     </Box>
 
                     {/* Tabla de citas con scroll si es necesario */}
-                    <Box sx={{ overflowX: "auto" }}>
+                    {/* <Box sx={{ overflowX: "auto" }}>
                         <TableContainer component={Paper} sx={{ mb: 3 }}>
                             <Table>
                                 <TableHead>
@@ -211,10 +211,55 @@ const CompShowQuotes = () => {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+                    </Box> */}
+                    <Box sx={{ overflowX: "auto" }}>
+                        <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2, mb: 3 }}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+                                        <TableCell sx={{ fontWeight: "bold" }}>Nombre del Usuario</TableCell>
+                                        <TableCell sx={{ fontWeight: "bold" }}>Fecha y Hora</TableCell>
+                                        <TableCell sx={{ fontWeight: "bold" }}>Acciones</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {quotes.length > 0 ? (
+                                        quotes.map((quote, index) => (
+                                            <TableRow
+                                                key={quote.id_quotePK}
+                                                sx={{
+                                                    backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
+                                                    "&:hover": { backgroundColor: "#f0f0f0" },
+                                                }}
+                                            >
+                                                <TableCell>{quote.tbl_user?.name || "Sin nombre"}</TableCell>
+                                                <TableCell>
+                                                    {new Date(quote.dateAndTimeQuote).toLocaleString()}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {quote.status === "activa" && (
+                                                        <CancelButtonQuote
+                                                            idQuote={quote.id_quotePK}
+                                                            onCancelSuccess={() => getQuotes()}
+                                                        />
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={3} align="center">
+                                                No hay citas registradas
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     </Box>
 
                     {/* Paginación */}
-                    <Box
+                    {/* <Box
                         sx={{
                             display: "flex",
                             justifyContent: "center",
@@ -238,8 +283,39 @@ const CompShowQuotes = () => {
                         >
                             Siguiente
                         </Button>
-                    </Box>
+                    </Box> */}
 
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: 2,
+                            mb: 1,
+                        }}
+                    >
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => cambiarPagina(pagina - 1)}
+                            disabled={pagina === 1}
+                            startIcon={<span>&larr;</span>}
+                        >
+                            Anterior
+                        </Button>
+                        <Typography sx={{ fontWeight: "bold" }}>
+                            Página {pagina} de {totalPaginas}
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => cambiarPagina(pagina + 1)}
+                            disabled={pagina === totalPaginas}
+                            endIcon={<span>&rarr;</span>}
+                        >
+                            Siguiente
+                        </Button>
+                    </Box>
                     {/* Calendario ajustable */}
                     <Box sx={{ width: "100%", overflowX: "auto" }}>
                         <QuotesCalendar />
