@@ -173,45 +173,6 @@ const CompShowQuotes = () => {
                     </Box>
 
                     {/* Tabla de citas con scroll si es necesario */}
-                    {/* <Box sx={{ overflowX: "auto" }}>
-                        <TableContainer component={Paper} sx={{ mb: 3 }}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Nombre del Usuario</TableCell>
-                                        <TableCell>Fecha y Hora</TableCell>
-                                        <TableCell>Acciones</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {quotes.length > 0 ? (
-                                        quotes.map((quote) => (
-                                            <TableRow key={quote.id_quotePK}>
-                                                <TableCell>{quote.tbl_user?.name || "Sin nombre"}</TableCell>
-                                                <TableCell>
-                                                    {new Date(quote.dateAndTimeQuote).toLocaleString()}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {quote.status === "activa" && (
-                                                        <CancelButtonQuote
-                                                            idQuote={quote.id_quotePK}
-                                                            onCancelSuccess={() => getQuotes()}
-                                                        />
-                                                    )}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={3} align="center">
-                                                No hay citas registradas
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Box> */}
                     <Box sx={{ overflowX: "auto" }}>
                         <TableContainer component={Paper} elevation={2} sx={{ borderRadius: 2, mb: 3 }}>
                             <Table>
@@ -259,31 +220,6 @@ const CompShowQuotes = () => {
                     </Box>
 
                     {/* Paginación */}
-                    {/* <Box
-                        sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            gap: 2,
-                            mb: 1,
-                        }}
-                    >
-                        <Button
-                            onClick={() => cambiarPagina(pagina - 1)}
-                            disabled={pagina === 1}
-                        >
-                            Anterior
-                        </Button>
-                        <Typography>
-                            Página {pagina} de {totalPaginas}
-                        </Typography>
-                        <Button
-                            onClick={() => cambiarPagina(pagina + 1)}
-                            disabled={pagina === totalPaginas}
-                        >
-                            Siguiente
-                        </Button>
-                    </Box> */}
 
                     <Box
                         sx={{
